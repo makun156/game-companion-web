@@ -1,6 +1,6 @@
 import request from '@/utils/request';
 import { AxiosPromise } from 'axios';
-import { GamesVO, GamesForm, GamesQuery } from '@/api/games/info/types';
+import { GamesVO, GamesForm, GamesQuery } from '@/api/game/info/types';
 
 /**
  * 查询游戏列表列表

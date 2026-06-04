@@ -24,9 +24,9 @@ export interface GamesVO {
   description: string;
 
   /**
-   * 游戏分类(参见字典sys_category)
+   * 游戏分类ID
    */
-  category: string;
+  categoryId: string | number;
 
   /**
    * 排序
@@ -62,9 +62,9 @@ export interface GamesForm extends BaseEntity {
   description?: string;
 
   /**
-   * 游戏分类(参见字典sys_category)
+   * 游戏分类ID
    */
-  category?: string;
+  categoryId?: string | number;
 
   /**
    * 排序
@@ -86,9 +86,9 @@ export interface GamesQuery extends PageQuery {
   name?: string;
 
   /**
-   * 游戏分类(参见字典sys_category)
+   * 游戏分类ID
    */
-  category?: string;
+  categoryId?: string | number;
 
   /**
    * 状态(0-启用[默认] 1-禁用)
