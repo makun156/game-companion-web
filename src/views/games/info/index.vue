@@ -8,13 +8,13 @@
               <el-input v-model="queryParams.name" placeholder="请输入游戏名称" clearable @keyup.enter="handleQuery" />
             </el-form-item>
             <el-form-item label="游戏分类" prop="category">
-              <el-select v-model="queryParams.category" placeholder="请选择游戏分类" clearable >
-                <el-option v-for="dict in sys_category" :key="dict.value" :label="dict.label" :value="dict.value"/>
+              <el-select v-model="queryParams.category" placeholder="请选择游戏分类" clearable>
+                <el-option v-for="dict in business_category" :key="dict.value" :label="dict.label" :value="dict.value" />
               </el-select>
             </el-form-item>
             <el-form-item label="状态" prop="status">
-              <el-select v-model="queryParams.status" placeholder="请选择状态" clearable >
-                <el-option v-for="dict in sys_use_status" :key="dict.value" :label="dict.label" :value="dict.value"/>
+              <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
+                <el-option v-for="dict in business_use_status" :key="dict.value" :label="dict.label" :value="dict.value" />
               </el-select>
             </el-form-item>
             <el-form-item>
@@ -33,10 +33,14 @@
             <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['ruoyi-business:games:add']">新增</el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate()" v-hasPermi="['ruoyi-business:games:edit']">修改</el-button>
+            <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate()" v-hasPermi="['ruoyi-business:games:edit']"
+              >修改</el-button
+            >
           </el-col>
           <el-col :span="1.5">
-            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete()" v-hasPermi="['ruoyi-business:games:remove']">删除</el-button>
+            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete()" v-hasPermi="['ruoyi-business:games:remove']"
+              >删除</el-button
+            >
           </el-col>
           <el-col :span="1.5">
             <el-button type="warning" plain icon="Download" @click="handleExport" v-hasPermi="['ruoyi-business:games:export']">导出</el-button>
@@ -51,22 +55,22 @@
         <el-table-column label="游戏名称" align="center" prop="name" />
         <el-table-column label="游戏图标地址" align="center" prop="iconUrl" width="100">
           <template #default="scope">
-            <image-preview :src="scope.row.iconUrl" :width="50" :height="50"/>
+            <image-preview :src="scope.row.iconUrl" :width="50" :height="50" />
           </template>
         </el-table-column>
         <el-table-column label="描述" align="center" prop="description" />
         <el-table-column label="游戏分类" align="center" prop="category">
           <template #default="scope">
-            <dict-tag :options="sys_category" :value="scope.row.category"/>
+            <dict-tag :options="business_category" :value="scope.row.category" />
           </template>
         </el-table-column>
         <el-table-column label="排序" align="center" prop="sort" />
         <el-table-column label="状态" align="center" prop="status">
           <template #default="scope">
-            <dict-tag :options="sys_use_status" :value="scope.row.status"/>
+            <dict-tag :options="business_use_status" :value="scope.row.status" />
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" fixed="right"  class-name="small-padding fixed-width">
+        <el-table-column label="操作" align="center" fixed="right" class-name="small-padding fixed-width">
           <template #default="scope">
             <el-tooltip content="修改" placement="top">
               <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['ruoyi-business:games:edit']"></el-button>
@@ -87,19 +91,14 @@
           <el-input v-model="form.name" placeholder="请输入游戏名称" />
         </el-form-item>
         <el-form-item label="游戏图标地址" prop="icon">
-          <image-upload v-model="form.icon"/>
+          <image-upload v-model="form.icon" />
         </el-form-item>
         <el-form-item label="描述" prop="description">
-            <el-input v-model="form.description" type="textarea" placeholder="请输入内容" />
+          <el-input v-model="form.description" type="textarea" placeholder="请输入内容" />
         </el-form-item>
         <el-form-item label="游戏分类" prop="category">
           <el-select v-model="form.category" placeholder="请选择游戏分类">
-            <el-option
-                v-for="dict in sys_category"
-                :key="dict.value"
-                :label="dict.label"
-                :value="dict.value"
-            ></el-option>
+            <el-option v-for="dict in business_category" :key="dict.value" :label="dict.label" :value="dict.value"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="排序" prop="sort">
@@ -107,12 +106,7 @@
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-select v-model="form.status" placeholder="请选择状态">
-            <el-option
-                v-for="dict in sys_use_status"
-                :key="dict.value"
-                :label="dict.label"
-                :value="parseInt(dict.value)"
-            ></el-option>
+            <el-option v-for="dict in business_use_status" :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -131,7 +125,7 @@ import { listGames, getGames, delGames, addGames, updateGames } from '@/api/game
 import { GamesVO, GamesQuery, GamesForm } from '@/api/games/info/types';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
-const { sys_use_status, sys_category } = toRefs<any>(proxy?.useDict('sys_use_status', 'sys_category'));
+const { business_use_status, business_category } = toRefs<any>(proxy?.useDict('business_use_status', 'business_category'));
 
 const gamesList = ref<GamesVO[]>([]);
 const buttonLoading = ref(false);
@@ -157,32 +151,23 @@ const initFormData: GamesForm = {
   description: undefined,
   category: undefined,
   sort: 1,
-  status: undefined,
-}
+  status: undefined
+};
 const data = reactive<PageData<GamesForm, GamesQuery>>({
-  form: {...initFormData},
+  form: { ...initFormData },
   queryParams: {
     pageNum: 1,
     pageSize: 10,
     name: undefined,
     category: undefined,
     status: undefined,
-    params: {
-    }
+    params: {}
   },
   rules: {
-    name: [
-      { required: true, message: "游戏名称不能为空", trigger: "blur" }
-    ],
-    icon: [
-      { required: true, message: "游戏图标不能为空", trigger: "change" }
-    ],
-    category: [
-      { required: true, message: "游戏分类不能为空", trigger: "change" }
-    ],
-    status: [
-      { required: true, message: "状态不能为空", trigger: "change" }
-    ],
+    name: [{ required: true, message: '游戏名称不能为空', trigger: 'blur' }],
+    icon: [{ required: true, message: '游戏图标不能为空', trigger: 'change' }],
+    category: [{ required: true, message: '游戏分类不能为空', trigger: 'change' }],
+    status: [{ required: true, message: '状态不能为空', trigger: 'change' }]
   }
 });
 
@@ -195,55 +180,55 @@ const getList = async () => {
   gamesList.value = res.rows;
   total.value = res.total;
   loading.value = false;
-}
+};
 
 /** 取消按钮 */
 const cancel = () => {
   reset();
   dialog.visible = false;
-}
+};
 
 /** 表单重置 */
 const reset = () => {
-  form.value = {...initFormData};
+  form.value = { ...initFormData };
   gamesFormRef.value?.resetFields();
-}
+};
 
 /** 搜索按钮操作 */
 const handleQuery = () => {
   queryParams.value.pageNum = 1;
   getList();
-}
+};
 
 /** 重置按钮操作 */
 const resetQuery = () => {
   queryFormRef.value?.resetFields();
   handleQuery();
-}
+};
 
 /** 多选框选中数据 */
 const handleSelectionChange = (selection: GamesVO[]) => {
-  ids.value = selection.map(item => item.id);
+  ids.value = selection.map((item) => item.id);
   single.value = selection.length != 1;
   multiple.value = !selection.length;
-}
+};
 
 /** 新增按钮操作 */
 const handleAdd = () => {
   reset();
   dialog.visible = true;
-  dialog.title = "添加游戏列表";
-}
+  dialog.title = '添加游戏列表';
+};
 
 /** 修改按钮操作 */
 const handleUpdate = async (row?: GamesVO) => {
   reset();
-  const _id = row?.id || ids.value[0]
+  const _id = row?.id || ids.value[0];
   const res = await getGames(_id);
   Object.assign(form.value, res.data);
   dialog.visible = true;
-  dialog.title = "修改游戏列表";
-}
+  dialog.title = '修改游戏列表';
+};
 
 /** 提交按钮 */
 const submitForm = () => {
@@ -251,32 +236,36 @@ const submitForm = () => {
     if (valid) {
       buttonLoading.value = true;
       if (form.value.id) {
-        await updateGames(form.value).finally(() =>  buttonLoading.value = false);
+        await updateGames(form.value).finally(() => (buttonLoading.value = false));
       } else {
-        await addGames(form.value).finally(() =>  buttonLoading.value = false);
+        await addGames(form.value).finally(() => (buttonLoading.value = false));
       }
-      proxy?.$modal.msgSuccess("操作成功");
+      proxy?.$modal.msgSuccess('操作成功');
       dialog.visible = false;
       await getList();
     }
   });
-}
+};
 
 /** 删除按钮操作 */
 const handleDelete = async (row?: GamesVO) => {
   const _ids = row?.id || ids.value;
-  await proxy?.$modal.confirm('是否确认删除游戏列表编号为"' + _ids + '"的数据项？').finally(() => loading.value = false);
+  await proxy?.$modal.confirm('是否确认删除游戏列表编号为"' + _ids + '"的数据项？').finally(() => (loading.value = false));
   await delGames(_ids);
-  proxy?.$modal.msgSuccess("删除成功");
+  proxy?.$modal.msgSuccess('删除成功');
   await getList();
-}
+};
 
 /** 导出按钮操作 */
 const handleExport = () => {
-  proxy?.download('/games/export', {
-    ...queryParams.value
-  }, `games_${new Date().getTime()}.xlsx`)
-}
+  proxy?.download(
+    '/games/export',
+    {
+      ...queryParams.value
+    },
+    `games_${new Date().getTime()}.xlsx`
+  );
+};
 
 onMounted(() => {
   getList();
