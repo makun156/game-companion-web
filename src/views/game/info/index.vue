@@ -30,20 +30,18 @@
       <template #header>
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['ruoyi-business:games:add']">新增</el-button>
+            <el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['games:info:add']">新增</el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate()" v-hasPermi="['ruoyi-business:games:edit']"
-              >修改</el-button
-            >
+            <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate()" v-hasPermi="['games:info:edit']">修改</el-button>
           </el-col>
           <el-col :span="1.5">
-            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete()" v-hasPermi="['ruoyi-business:games:remove']"
+            <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete()" v-hasPermi="['games:info:remove']"
               >删除</el-button
             >
           </el-col>
           <el-col :span="1.5">
-            <el-button type="warning" plain icon="Download" @click="handleExport" v-hasPermi="['ruoyi-business:games:export']">导出</el-button>
+            <el-button type="warning" plain icon="Download" @click="handleExport" v-hasPermi="['games:info:export']">导出</el-button>
           </el-col>
           <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
@@ -61,7 +59,7 @@
         <el-table-column label="描述" align="center" prop="description" />
         <el-table-column label="游戏分类" align="center" prop="categoryId">
           <template #default="scope">
-            {{ categoryList.find(item => item.id === scope.row.categoryId)?.name || scope.row.categoryId }}
+            {{ categoryList.find((item) => String(item.id) === String(scope.row.categoryId))?.name || scope.row.categoryId }}
           </template>
         </el-table-column>
         <el-table-column label="排序" align="center" prop="sort" />
@@ -73,10 +71,10 @@
         <el-table-column label="操作" align="center" fixed="right" class-name="small-padding fixed-width">
           <template #default="scope">
             <el-tooltip content="修改" placement="top">
-              <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['ruoyi-business:games:edit']"></el-button>
+              <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['games:info:edit']"></el-button>
             </el-tooltip>
             <el-tooltip content="删除" placement="top">
-              <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['ruoyi-business:games:remove']"></el-button>
+              <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['games:info:delete']"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -93,13 +91,13 @@
         <el-form-item label="游戏图标地址" prop="icon">
           <image-upload v-model="form.icon" />
         </el-form-item>
-        <el-form-item label="描述" prop="description">
-          <el-input v-model="form.description" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
         <el-form-item label="游戏分类" prop="categoryId">
           <el-select v-model="form.categoryId" placeholder="请选择游戏分类" @focus="getCategoryList">
             <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="描述" prop="description">
+          <el-input v-model="form.description" type="textarea" placeholder="请输入内容" />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input-number v-model="form.sort" :min="0" controls-position="right" />
@@ -109,6 +107,35 @@
             <el-option v-for="dict in business_use_status" :key="dict.value" :label="dict.label" :value="parseInt(dict.value)"></el-option>
           </el-select>
         </el-form-item>
+        <!-- 游戏段位列表 -->
+        <el-divider content-position="left">游戏段位</el-divider>
+        <el-row class="mb-2">
+          <el-button type="primary" plain size="small" icon="Plus" @click="handleAddLevel">添加段位</el-button>
+        </el-row>
+        <el-table :data="form.gameLevels" border size="small" v-if="form.gameLevels && form.gameLevels.length > 0">
+          <el-table-column label="段位名称" align="center">
+            <template #default="scope">
+              <el-input v-model="scope.row.level" placeholder="请输入段位名称" />
+            </template>
+          </el-table-column>
+          <el-table-column label="排序" align="center" width="150">
+            <template #default="scope">
+              <el-input-number v-model="scope.row.sort" :min="0" :step="1" :precision="0" step-strictly controls-position="right" />
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" align="center" width="150">
+            <template #default="scope">
+              <el-select v-model="scope.row.status" placeholder="请选择状态">
+                <el-option v-for="dict in business_use_status" :key="dict.value" :label="dict.label" :value="dict.value"></el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" align="center" width="80">
+            <template #default="scope">
+              <el-button link type="danger" icon="Delete" @click="handleDeleteLevel(scope.$index)"></el-button>
+            </template>
+          </el-table-column>
+        </el-table>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -122,7 +149,7 @@
 
 <script setup name="Games" lang="ts">
 import { listGames, getGames, delGames, addGames, updateGames } from '@/api/game/info';
-import { GamesVO, GamesQuery, GamesForm } from '@/api/game/info/types';
+import { GamesVO, GamesQuery, GamesForm, GameLevel } from '@/api/game/info/types';
 import { listGameCategory } from '@/api/game/category';
 import { GameCategoryVO } from '@/api/game/category/types';
 
@@ -135,6 +162,7 @@ const buttonLoading = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
 const ids = ref<Array<string | number>>([]);
+const names = ref<Array<string>>([]);
 const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
@@ -154,7 +182,8 @@ const initFormData: GamesForm = {
   description: undefined,
   categoryId: undefined,
   sort: 1,
-  status: undefined
+  status: undefined,
+  gameLevels: []
 };
 const data = reactive<PageData<GamesForm, GamesQuery>>({
   form: { ...initFormData },
@@ -218,6 +247,7 @@ const resetQuery = () => {
 /** 多选框选中数据 */
 const handleSelectionChange = (selection: GamesVO[]) => {
   ids.value = selection.map((item) => item.id);
+  names.value = selection.map((item) => item.name);
   single.value = selection.length != 1;
   multiple.value = !selection.length;
 };
@@ -256,10 +286,24 @@ const submitForm = () => {
   });
 };
 
+/** 添加段位 */
+const handleAddLevel = () => {
+  if (!form.value.gameLevels) {
+    form.value.gameLevels = [];
+  }
+  form.value.gameLevels.push({ level: '', sort: 0, status: '0' });
+};
+
+/** 删除段位 */
+const handleDeleteLevel = (index: number) => {
+  form.value.gameLevels?.splice(index, 1);
+};
+
 /** 删除按钮操作 */
 const handleDelete = async (row?: GamesVO) => {
   const _ids = row?.id || ids.value;
-  await proxy?.$modal.confirm('是否确认删除游戏列表编号为"' + _ids + '"的数据项？').finally(() => (loading.value = false));
+  const _names = row?.name || names.value.join(',');
+  await proxy?.$modal.confirm('是否确认删除游戏名称为"' + _names + '"的数据项？').finally(() => (loading.value = false));
   await delGames(_ids);
   proxy?.$modal.msgSuccess('删除成功');
   await getList();

@@ -1,3 +1,20 @@
+/**
+ * 游戏段位
+ */
+export interface GameLevel {
+  /**
+   * 段位名称
+   */
+  level?: string;
+
+  sort?: number;
+
+  /**
+   * 状态(0-启用[默认] 1-禁用)
+   */
+  status?: string;
+}
+
 export interface GamesVO {
   /**
    * 
@@ -38,6 +55,10 @@ export interface GamesVO {
    */
   status: number;
 
+  /**
+   * 游戏段位列表
+   */
+  gameLevels?: GameLevel[];
 }
 
 export interface GamesForm extends BaseEntity {
@@ -76,6 +97,10 @@ export interface GamesForm extends BaseEntity {
    */
   status?: number;
 
+  /**
+   * 游戏段位列表
+   */
+  gameLevels?: GameLevel[];
 }
 
 export interface GamesQuery extends PageQuery {
