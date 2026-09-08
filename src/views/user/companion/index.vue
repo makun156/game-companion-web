@@ -161,6 +161,9 @@
         <el-form-item label="头像" prop="avatar">
           <image-upload v-model="form.avatar" :limit="1" />
         </el-form-item>
+        <el-form-item label="语音介绍" prop="voice">
+          <file-upload v-model="voiceId" :limit="1" :file-type="['mp3', 'wav', 'm4a', 'aac', 'amr', 'ogg']" :file-size="10" />
+        </el-form-item>
         <el-form-item label="接单区域" prop="city">
           <el-tree-select
             v-model="form.city"
@@ -234,6 +237,7 @@ const allCityTreeData = ref<CityVO[]>([]);
 const queryFormRef = ref<ElFormInstance>();
 const gameCompanionUserFormRef = ref<ElFormInstance>();
 const photoIds = ref('');
+const voiceId = ref('');
 
 const dialog = reactive<DialogOption>({
   visible: false,
@@ -247,6 +251,7 @@ const initFormData: GameCompanionUserForm = {
   age: undefined,
   phone: undefined,
   avatar: undefined,
+  voice: undefined,
   city: undefined,
   introduction: undefined,
   tags: undefined,
@@ -365,6 +370,7 @@ const cancel = () => {
 const reset = () => {
   form.value = { ...initFormData };
   photoIds.value = '';
+  voiceId.value = '';
   gameCompanionUserFormRef.value?.resetFields();
 };
 
@@ -406,8 +412,9 @@ const handleUpdate = async (row?: GameCompanionUserVO) => {
   }
   // 将 photos 数组转为逗号分隔的 ossId 字符串供 image-upload 组件回显
   if (res.data.photos && res.data.photos.length > 0) {
-    photoIds.value = res.data.photos.map((p) => p.photo).join(',');
+    photoIds.value = res.data.photos.join(',');
   }
+  voiceId.value = res.data.voice || '';
   dialog.visible = true;
   dialog.title = '修改陪玩表';
 };
@@ -417,12 +424,13 @@ const submitForm = () => {
   gameCompanionUserFormRef.value?.validate(async (valid: boolean) => {
     if (valid) {
       buttonLoading.value = true;
-      // 将 photoIds 字符串转回 photos 数组格式
+      // 将 photoIds 字符串转回 oss id 数组格式
       if (photoIds.value) {
-        form.value.photos = photoIds.value.split(',').map((id) => ({ photo: id }));
+        form.value.photos = photoIds.value.split(',');
       } else {
         form.value.photos = [];
       }
+      form.value.voice = voiceId.value;
       // 构建干净的提交数据，只包含业务字段，避免后端展示字段干扰
       const submitData = {
         id: form.value.id,
@@ -431,6 +439,7 @@ const submitForm = () => {
         age: form.value.age,
         phone: form.value.phone,
         avatar: form.value.avatar,
+        voice: form.value.voice,
         city: form.value.city,
         introduction: form.value.introduction,
         tags: form.value.tags,

@@ -35,6 +35,16 @@ export interface GameCompanionUserVO {
   avatarUrl: string;
 
   /**
+   * 语音介绍oss id
+   */
+  voice: string;
+
+  /**
+   * 语音地址
+   */
+  voiceUrl: string;
+
+  /**
    * 接单区域id
    */
   city: number;
@@ -72,7 +82,7 @@ export interface GameCompanionUserVO {
   /**
    * 相册
    */
-  photos: GameCompanionPhotoBo[];
+  photos: string[];
 }
 
 export interface GameCompanionUserForm extends BaseEntity {
@@ -107,6 +117,11 @@ export interface GameCompanionUserForm extends BaseEntity {
   avatar?: string;
 
   /**
+   * 语音介绍oss id
+   */
+  voice?: string;
+
+  /**
    * 接单区域id
    */
   city?: number;
@@ -134,14 +149,10 @@ export interface GameCompanionUserForm extends BaseEntity {
   /**
    * 相册
    */
-  photos?: GameCompanionPhotoBo[];
+  photos?: string[];
 }
 
-export interface GameCompanionPhotoBo {
-  /**
-   * 主键id
-   */
-  id?: string | number;
+export interface GameCompanionPhotoVo {
   /**
    * 图片oss id
    */
